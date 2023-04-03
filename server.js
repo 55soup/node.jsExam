@@ -49,11 +49,23 @@ app.post("/add", function (요청, 응답) {
     { name: "게시물갯수" },
     function (error, result) {
       console.log(result.totalPost);
-      let 총게시물갯수 = 결과.totalPost;
+      // 총게시물갯수를 변수에 저장
+      let 총게시물갯수 = result.totalPost;
+      // DB.post에 새게시물을 기록함
       db.collection("post").insertOne(
         { _id: 총게시물갯수 + 1, 제목: 요청.body.title, 날짜: 요청.body.date },
         function (error, result) {
           console.log("저장완료");
+          // counter라는 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야함(수정)
+          db.collection("counter").updateOne(
+            { name: "게시물갯수" },
+            { $inc: { totalPost: 1 } }, //inc: 1을 증가시킴.
+            function (error, result) {
+              // 콜백함수는 없어도 됨
+              if (error) return console.log(error);
+              console.log(result);
+            }
+          );
         }
       );
     }
