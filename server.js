@@ -45,12 +45,17 @@ app.get("/write", (요청, 응답) => {
 // 어떤 사람이 /add 경로로 POST 요청을 하면... ??를 해주세요
 app.post("/add", function (요청, 응답) {
   응답.send("전송완료");
-  console.log(요청.body.date);
-  console.log(요청.body.title);
-  db.collection("post").insertOne(
-    { 제목: 요청.body.title, 날짜: 요청.body.date },
+  db.collection("counter").findOne(
+    { name: "게시물갯수" },
     function (error, result) {
-      console.log("저장완료");
+      console.log(result.totalPost);
+      let 총게시물갯수 = 결과.totalPost;
+      db.collection("post").insertOne(
+        { _id: 총게시물갯수 + 1, 제목: 요청.body.title, 날짜: 요청.body.date },
+        function (error, result) {
+          console.log("저장완료");
+        }
+      );
     }
   );
 });
