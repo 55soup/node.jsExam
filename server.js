@@ -48,7 +48,6 @@ app.post("/add", function (요청, 응답) {
   db.collection("counter").findOne(
     { name: "게시물갯수" },
     function (error, result) {
-      console.log(result.totalPost);
       // 총게시물갯수를 변수에 저장
       let 총게시물갯수 = result.totalPost;
       // DB.post에 새게시물을 기록함
@@ -83,4 +82,14 @@ app.get("/list", (request, response) => {
 
   //HTML렌더링
   // DB에 저장된 post라는 collection안에 모든 데이터를 꺼내기
+});
+
+app.delete("/delete", function (req, res) {
+  console.log(req.body);
+  // {_id: '1'} -> {_id: 1}숫자로 변환
+  req.body._id = parseInt(req.body._id);
+  // res.body에 담겨온 게시물번호를 가진 글을 db에서 찾아 삭제해주세요
+  db.collection("post").deleteOne(req.body, function (error, result) {
+    console.log("삭제완료");
+  });
 });
