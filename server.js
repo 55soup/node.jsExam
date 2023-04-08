@@ -60,9 +60,8 @@ app.post("/add", function (요청, 응답) {
             { name: "게시물갯수" },
             { $inc: { totalPost: 1 } }, //inc: 1을 증가시킴.
             function (error, result) {
-              // 콜백함수는 없어도 됨
-              if (error) return console.log(error);
-              console.log(result);
+              console.log("삭제완료");
+              응답.status(200).send({ message: "성공했습니다" });
             }
           );
         }

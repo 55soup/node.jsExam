@@ -28,12 +28,18 @@
     <script>
       $('.delete').click(function(e){
         let postnum = e.target.dataset.id; // 내가 누른 요소의 data-id
+        let click = $(this);
         $.ajax({
         method: 'DELETE',
         url: '/delete',
         data: {_id : postnum},
         }).done(function(result){
-          location.reload();
+          // 페이지를 강제로 새로고침해주세요. location.reload()
+          // 삭제버튼을 누른 <li> 요소를 제거해주세요 / 안보이게
+          console.log('성공했습니다.')
+          click.parent('li').fadeOut();
+        }).fail(function(){
+
         })
       })
     </script>
