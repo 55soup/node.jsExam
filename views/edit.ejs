@@ -16,18 +16,21 @@
     <form action="/add" method="POST" style="margin: 10rem">
       <!-- action: POST를 할 경로 -->
       <!-- method: GET, POST(서버에게 요청하는 방법 ) -->
-      <h1>오늘의 할 일을 기록해봐요</h1>
+      <h1>오늘의 할 일을 수정해봐요</h1>
       <div class="form-group">
-        <label for="exampleInputEmail1">오늘의 할일</label>
-        <input name="title" class="form-control" id="exampleInputEmail1" />
+        <label for="exampleInputEmail1"></label>
+        <input
+          value="<%= post.제목 %>"
+          name="title"
+          class="form-control"
+          id="exampleInputEmail1"
+        />
       </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">날짜</label>
-        <textarea
-          name="date"
-          class="form-control"
-          placeholder="날짜"
-        ></textarea>
+        <label for="exampleInputPassword1"></label>
+        <textarea name="date" class="form-control" placeholder="날짜">
+        <%= post.날짜 %></textarea
+        >
       </div>
       <div class="form-group form-check"></div>
       <button type="submit" class="btn btn-primary">저장하기</button>
