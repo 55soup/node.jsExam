@@ -38,8 +38,9 @@
           // 삭제버튼을 누른 <li> 요소를 제거해주세요 / 안보이게
           console.log('성공했습니다.')
           click.parent('li').fadeOut();
-        }).fail(function(){
-
+        }).fail(function(xhr, textStatus, error){
+          console.log('실패했습니다.')
+          console.log(xhr, textStatus, error)
         })
       })
     </script>
