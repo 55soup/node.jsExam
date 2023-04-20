@@ -6,6 +6,9 @@ const port = 8081; //서버포트
 const MongoClient = require("mongodb").MongoClient; //mogoDB사용
 app.set("view engine", "ejs"); //ejs nodejs가 렌더링 할 수 있도록 하는 코드
 app.use("/public", express.static("public"));
+// method-override 패키지 사용
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
 
 let db;
 MongoClient.connect(
@@ -111,6 +114,19 @@ app.get("/edit/:id", function (req, res) {
     function (error, result) {
       console.log(result);
       res.render("edit.ejs", { post: result });
+    }
+  );
+});
+
+app.put("/edit", function (req, res) {
+  // 폼에 담긴 제목데이터, 날짜데이터를 가지고
+  // db.collection 에 업데이트함
+  db.collection("post").updateOne(
+    { _id: parseInt(req.body.id) },
+    { $set: { 제목: req.body.title, 날짜: req.body.date } },
+    function (error, result) {
+      console.log("수정완료");
+      res.redirect("/list");
     }
   );
 });
