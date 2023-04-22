@@ -13,8 +13,8 @@ app.use(methodOverride("_method"));
 let db;
 MongoClient.connect(
   "mongodb+srv://admin:qwer1234@cluster0.u0flyy5.mongodb.net/todoapp?retryWrites=true&w=majority",
-  function (에러, client) {
-    if (에러) return console.log(에러);
+  function (error, client) {
+    if (error) return console.log(error);
     db = client.db("todoapp");
 
     // db.collection("post").insertOne(
@@ -130,3 +130,58 @@ app.put("/edit", function (req, res) {
     }
   );
 });
+
+// 로그인 & 세션생성을 도와주는 라이브러리
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+
+// app.use(미들웨어) 미들웨어: 요청 - 응답 중간에 뭔가 실행되는 코드
+app.use(
+  session({ secret: "비밀코드", resave: true, saveUninitialized: false })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/login", function (req, res) {
+  res.render("login.ejs");
+});
+
+// passport: 로그인 기능 쉽게 구현가능
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+  }),
+  function (req, res) {
+    req.redirect("/");
+  }
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "id", // 유저가 입력한 아이디/비번 항목이 뭔지 정의 (name)
+      passwordField: "pw",
+      session: true, // 로그인 후 세션을 저장할 것인지
+      passReqToCallback: false, // id/pw외 다른 검증서
+    },
+    function (입력한아이디, 입력한비번, done) {
+      //console.log(입력한아이디, 입력한비번);
+      db.collection("login").findOne(
+        { id: 입력한아이디 },
+        function (error, result) {
+          if (error) return done(error);
+
+          if (!result)
+            return done(null, false, { message: "존재하지않는 아이디" });
+          if (입력한비번 == result.pw) {
+            return done(null, result);
+          } else {
+            return done(null, false, { message: "비밀번호가 맞지 않습니다." });
+          }
+        }
+      );
+    }
+  )
+);
