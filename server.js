@@ -154,10 +154,11 @@ app.post(
     failureRedirect: "/fail",
   }),
   function (req, res) {
-    req.redirect("/");
+    res.redirect("/");
   }
 );
 
+// 로그인 기능 구현
 passport.use(
   new LocalStrategy(
     {
@@ -174,9 +175,12 @@ passport.use(
           if (error) return done(error);
 
           if (!result)
+            // DB에 아이디가 없다면
+            // done(서버에러, 성공시 사용자 DB데이터, 에러메세지)
             return done(null, false, { message: "존재하지않는 아이디" });
           if (입력한비번 == result.pw) {
-            return done(null, result);
+            // 성공!
+            return done(null, result); // 성공시 세션으로 아이디를 보냄.
           } else {
             return done(null, false, { message: "비밀번호가 맞지 않습니다." });
           }
@@ -185,3 +189,12 @@ passport.use(
     }
   )
 );
+
+// 세션 저장 - 로그인 성공시 실행
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+passport.deserializeUser(function (id, done) {
+  // 세션데이터를 가진사람을 DB에서 찾음 - 마이페이지 접속시 실행
+  done(null, {});
+});
