@@ -158,6 +158,20 @@ app.post(
   }
 );
 
+app.get("/mypage", chkLogin, function (req, res) {
+  console.log(req.user);
+  res.render("mypage.ejs", { user: req.user });
+});
+
+function chkLogin(req, res, next) {
+  // 마이페이지 접속 전 실행할 미들웨어
+  if (req.user) {
+    next();
+  } else {
+    res.send("로그인 하세요");
+  }
+}
+
 // 로그인 기능 구현
 passport.use(
   new LocalStrategy(
@@ -196,5 +210,8 @@ passport.serializeUser(function (user, done) {
 });
 passport.deserializeUser(function (id, done) {
   // 세션데이터를 가진사람을 DB에서 찾음 - 마이페이지 접속시 실행
-  done(null, {});
+  // db에서 위에 있는 user.id로 유저를 찾은 뒤에 유저 정보를 result 안에 넣음.
+  db.collection("login").findOne({ id: id }, function (err, result) {
+    done(null, result);
+  });
 });
