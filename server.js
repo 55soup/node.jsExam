@@ -1,8 +1,9 @@
 const express = require("express");
 const app = express();
+require("dotenv").config();
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
-const port = 8081; //서버포트
+const port = process.env.PORT; // 환경변수에서 서버포트 가져오기
 const MongoClient = require("mongodb").MongoClient; //mogoDB사용
 app.set("view engine", "ejs"); //ejs nodejs가 렌더링 할 수 있도록 하는 코드
 app.use("/public", express.static("public"));
@@ -11,24 +12,21 @@ const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
 let db;
-MongoClient.connect(
-  "mongodb+srv://admin:qwer1234@cluster0.u0flyy5.mongodb.net/todoapp?retryWrites=true&w=majority",
-  function (error, client) {
-    if (error) return console.log(error);
-    db = client.db("todoapp");
+MongoClient.connect(process.env.DB_URL, function (error, client) {
+  if (error) return console.log(error);
+  db = client.db("todoapp");
 
-    // db.collection("post").insertOne(
-    //   { 이름: "John", _id: 100 },
-    //   function (error, result) {
-    //     console.log("저장완료");
-    //   }
-    // );
+  // db.collection("post").insertOne(
+  //   { 이름: "John", _id: 100 },
+  //   function (error, result) {
+  //     console.log("저장완료");
+  //   }
+  // );
 
-    app.listen(port, function () {
-      console.log("listening on 8081");
-    });
-  }
-);
+  app.listen(port, function () {
+    console.log("listening on 8081");
+  });
+});
 
 app.get("/pet", function (req, res) {
   res.send("펫용품 사시오");
