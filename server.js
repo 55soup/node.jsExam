@@ -46,7 +46,6 @@ app.get("/write", (req, res) => {
 
 // 어떤 사람이 /add 경로로 POST req을 하면... ??를 해주세요
 app.post("/add", function (req, res) {
-  res.send("전송완료");
   db.collection("counter").findOne(
     { name: "게시물갯수" },
     function (error, result) {
@@ -55,30 +54,32 @@ app.post("/add", function (req, res) {
       // DB.post에 새게시물을 기록함
       db.collection("post").insertOne(
         { _id: 총게시물갯수 + 1, 제목: req.body.title, 날짜: req.body.date },
-        function (error, result) {
+        function () {
           console.log("저장완료");
-          // counter라는 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야함(수정)
-          db.collection("counter").updateOne(
-            { name: "게시물갯수" },
-            { $inc: { totalPost: 1 } }, //inc: 1을 증가시킴.
-            function (error, result) {
-              console.log("삭제완료");
-              res.status(200).send({ message: "성공했습니다" });
-            }
-          );
+        }
+      );
+      db.collection("counter").updateOne(
+        // counter라는 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야함(수정)
+        { name: "게시물갯수" },
+        { $inc: { totalPost: 1 } },
+        function (error, result) {
+          if (error) {
+            return console.log(error);
+          }
+          res.send("전송완료");
         }
       );
     }
   );
 });
 
-app.get("/list", (request, response) => {
+app.get("/list", (req, res) => {
   // DB에서 data를 꺼낸 후
   db.collection("post")
     .find()
     .toArray(function (error, result) {
       console.log(result);
-      response.render("list.ejs", { posts: result });
+      res.render("list.ejs", { posts: result });
     });
 
   //HTML렌더링
@@ -188,7 +189,7 @@ passport.use(
 
           if (!result)
             // DB에 아이디가 없다면
-            // done(서버에러, 성공시 사용자 DB데이터, 에러메세지)
+            // done(서버error, 성공시 사용자 DB데이터, error메세지)
             return done(null, false, { message: "존재하지않는 아이디" });
           if (입력한비번 == result.pw) {
             // 성공!
