@@ -130,6 +130,15 @@ app.put("/edit", function (req, res) {
   );
 });
 
+// 검색기능
+app.get("/search", (req, res) => {
+  db.collection("post")
+    .find({ 제목: req.query.value })
+    .toArray((error, result) => {
+      console.log(result);
+    });
+});
+
 // 로그인 & 세션생성을 도와주는 라이브러리
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
