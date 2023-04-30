@@ -20,8 +20,8 @@
       <!-- 검색창 -->
       <div class="container">
         <div class="container input-group mb-2">
-          <input class="form-control">
-          <button class="input-group-append btn btn-danger">검색</button>
+          <input class="form-control" id="search-input">
+          <button class="input-group-append btn btn-danger" id="search">검색</button>
         </div>
         <!-- list -->
         <ul class="list-group">
@@ -37,6 +37,13 @@
       </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>
+      // query string 검색
+      $('#search').click(function(){
+        // 주소창을 바꾸는 함수
+        let inputValue = $('#search-input').val() // 사용자가 input에 입력한 값
+        window.location.replace(`/search?value=${inputValue}`)
+      })
+      // 지우기
       $('.delete').click(function(e){
         let postnum = e.target.dataset.id; // 내가 누른 요소의 data-id
         let click = $(this);
