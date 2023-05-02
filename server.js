@@ -135,6 +135,7 @@ app.get("/search", (req, res) => {
   db.collection("post")
     .find({ 제목: req.query.value })
     .toArray((error, result) => {
+      res.render("search.ejs", { search: result, input: req.query.value });
       console.log(result);
     });
 });
