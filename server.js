@@ -139,8 +139,23 @@ indexing: collection을 정렬해둔 사본
 - nGram
 */
 app.get("/search", (req, res) => {
+  let searchReq = [
+    {
+      $search: {
+        index: "titleSearch",
+        text: {
+          query: req.query.value,
+          path: "제목", // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+        },
+      },
+    },
+    // 0: x가져옴 /  1: 가져옴 / score: 사용자가 검색한 단어와 얼마나 관련있는지 보여줌.
+    { $project: { 제목: 1, _id: 0, score: { $meta: "searchScore" } } },
+    // {$sort : {_id : 1}}, 정렬
+    // {$limit : 10 } 제한
+  ];
   db.collection("post")
-    .find({ $text: { $search: req.query.value } })
+    .aggregate(searchReq)
     .toArray((error, result) => {
       res.render("search.ejs", { search: result, input: req.query.value });
       console.log(result);
