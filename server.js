@@ -131,9 +131,16 @@ app.put("/edit", function (req, res) {
 });
 
 // 검색기능
+/*
+indexing하면 검색 후 탐색이 빨라짐.
+이진탐색은 미리 정렬이 되어있어야함.
+indexing: collection을 정렬해둔 사본
+한국어 친화적x 띄어쓰기를 기준으로 검색함
+- nGram
+*/
 app.get("/search", (req, res) => {
   db.collection("post")
-    .find({ 제목: req.query.value })
+    .find({ $text: { $search: req.query.value } })
     .toArray((error, result) => {
       res.render("search.ejs", { search: result, input: req.query.value });
       console.log(result);

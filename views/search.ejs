@@ -16,6 +16,12 @@
     <!-- 다른 html파일을 불러오기 -->
     <%- include('nav.html') %>
     <!-- 반드시 views폴더 안에  ejs파일 저장하기 -->
+     <!-- 검색창 -->
+     <div class="container">
+      <div class="container input-group mb-2">
+        <input class="form-control" id="search-input">
+        <button class="input-group-append btn btn-danger" id="search">검색</button>
+      </div>
     <h4 class="ml-2 my-3 text-center"><%= input %> 검색결과</h1>
       <!-- 검색창
       <div class="container">
@@ -43,6 +49,14 @@
         let inputValue = $('#search-input').val() // 사용자가 input에 입력한 값
         window.location.replace(`/search?value=${inputValue}`)
       })
+      /*
+      query string 
+      let data = { 이름 : '값', 이름2: '값'}
+      $.param(data) 
+      */
+
+      /* $(폼태그).searizlize()*/
+
       // 지우기
       $('.delete').click(function(e){
         let postnum = e.target.dataset.id; // 내가 누른 요소의 data-id
