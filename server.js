@@ -44,35 +44,6 @@ app.get("/write", (req, res) => {
   res.render("write.ejs");
 });
 
-// 어떤 사람이 /add 경로로 POST req을 하면... ??를 해주세요
-app.post("/add", function (req, res) {
-  db.collection("counter").findOne(
-    { name: "게시물갯수" },
-    function (error, result) {
-      // 총게시물갯수를 변수에 저장
-      let 총게시물갯수 = result.totalPost;
-      // DB.post에 새게시물을 기록함
-      db.collection("post").insertOne(
-        { _id: 총게시물갯수 + 1, 제목: req.body.title, 날짜: req.body.date },
-        function () {
-          console.log("저장완료");
-        }
-      );
-      db.collection("counter").updateOne(
-        // counter라는 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야함(수정)
-        { name: "게시물갯수" },
-        { $inc: { totalPost: 1 } },
-        function (error, result) {
-          if (error) {
-            return console.log(error);
-          }
-          res.send("전송완료");
-        }
-      );
-    }
-  );
-});
-
 app.get("/list", (req, res) => {
   // DB에서 data를 꺼낸 후
   db.collection("post")
@@ -84,17 +55,6 @@ app.get("/list", (req, res) => {
 
   //HTML렌더링
   // DB에 저장된 post라는 collection안에 모든 데이터를 꺼내기
-});
-
-app.delete("/delete", function (req, res) {
-  console.log(req.body);
-  // {_id: '1'} -> {_id: 1}숫자로 변환
-  req.body._id = parseInt(req.body._id);
-  // res.body에 담겨온 게시물번호를 가진 글을 db에서 찾아 삭제해주세요
-  db.collection("post").deleteOne(req.body, function (error, result) {
-    console.log("삭제완료");
-    res.status(200).send({ message: "성공했습니다" });
-  });
 });
 
 app.get("/detail/:id", function (req, res) {
@@ -244,5 +204,60 @@ passport.deserializeUser(function (id, done) {
   // db에서 위에 있는 user.id로 유저를 찾은 뒤에 유저 정보를 result 안에 넣음.
   db.collection("login").findOne({ id: id }, function (err, result) {
     done(null, result);
+  });
+});
+
+app.post("/register", function (req, res) {
+  db.collection("login").insertOne(
+    { id: req.body.id, pw: req.body.pw },
+    function (error, result) {
+      res.redirect("/");
+    }
+  );
+});
+
+// 어떤 사람이 /add 경로로 POST req을 하면... ??를 해주세요
+// NoSQL은 작성자 정보를 같이 저장함.
+app.post("/add", function (req, res) {
+  db.collection("counter").findOne(
+    { name: "게시물갯수" },
+    function (error, result) {
+      // 총게시물갯수를 변수에 저장
+      let 총게시물갯수 = result.totalPost;
+      let saveData = {
+        _id: 총게시물갯수 + 1,
+        제목: req.body.title,
+        날짜: req.body.date,
+        작성자: req.user._id,
+      };
+      // DB.post에 새게시물을 기록함
+      db.collection("post").insertOne(saveData, function () {
+        console.log("저장완료");
+      });
+      db.collection("counter").updateOne(
+        // counter라는 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야함(수정)
+        { name: "게시물갯수" },
+        { $inc: { totalPost: 1 } },
+        function (error, result) {
+          if (error) {
+            return console.log(error);
+          }
+          res.send("전송완료");
+        }
+      );
+    }
+  );
+});
+
+app.delete("/delete", function (req, res) {
+  console.log(req.body);
+  // {_id: '1'} -> {_id: 1}숫자로 변환
+  req.body._id = parseInt(req.body._id);
+  let delData = { _id: req.body._id, 작성자: req.user._id };
+  // res.body에 담겨온 게시물번호를 가진 글을 db에서 찾아 삭제해주세요
+  db.collection("post").deleteOne(delData, function (error, result) {
+    console.log(result);
+    console.log("삭제완료");
+    res.status(200).send({ message: "성공했습니다" });
   });
 });
