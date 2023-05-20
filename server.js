@@ -228,7 +228,7 @@ app.post("/add", function (req, res) {
         _id: 총게시물갯수 + 1,
         제목: req.body.title,
         날짜: req.body.date,
-        작성자: req.user._id,
+        작성자: req.user._id, //passport아래로
       };
       // DB.post에 새게시물을 기록함
       db.collection("post").insertOne(saveData, function () {
@@ -261,3 +261,12 @@ app.delete("/delete", function (req, res) {
     res.status(200).send({ message: "성공했습니다" });
   });
 });
+
+app.use("/shop", require("./routes/shop.js"));
+app.use("/board/sub", require("./routes/board.js"));
+// app.get("/shop/shirts", function (req, res) {
+//   res.send("셔츠 파는 페이지 입니다.");
+// });
+// app.get("/shop/pants", function (req, res) {
+//   res.send("바지 파는 페이지 입니다.");
+// });
