@@ -270,3 +270,33 @@ app.use("/board/sub", require("./routes/board.js"));
 // app.get("/shop/pants", function (req, res) {
 //   res.send("바지 파는 페이지 입니다.");
 // });
+
+let multer = require('multer');
+let storage = multer.diskStorage({
+  destination : function(req, file, db){
+    db(null, './public/image') // 이미지 업로드 경로
+  },
+  filename : function(req, file, cb){
+    cb(null, file.originalname) // 이미지 파일이름 지정
+  },
+  filefilter : function(req, file, db){
+
+  },
+  // limits: // 파일사이즈 제한
+});
+
+let upload = multer({storage : storage});
+
+app.get('/upload', function(req, res){
+  res.render('upload.ejs')
+});
+
+// 이미지 하나: upload.single('input의 name')
+// 이미지 여러개: upload.array('input의 name', 최대 받을 갯수)
+app.post('/upload', upload.single('profile'), function(req, res){
+  res.send("업로드-완료");
+});
+
+app.get('/image/:imageName', function(req, res){
+  res.sendFile(__dirname + '/public/image/' + req.params.imageName)
+});
