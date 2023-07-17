@@ -15,14 +15,6 @@ let db;
 MongoClient.connect(process.env.DB_URL, function (error, client) {
   if (error) return console.log(error);
   db = client.db("todoapp");
-
-  // db.collection("post").insertOne(
-  //   { 이름: "John", _id: 100 },
-  //   function (error, result) {
-  //     console.log("저장완료");
-  //   }
-  // );
-
   app.listen(port, function () {
     console.log("listening on 8081");
   });
@@ -271,6 +263,7 @@ app.use("/board/sub", require("./routes/board.js"));
 //   res.send("바지 파는 페이지 입니다.");
 // });
 
+// 이미지 업로드
 let multer = require('multer');
 let storage = multer.diskStorage({
   destination : function(req, file, db){
@@ -300,3 +293,7 @@ app.post('/upload', upload.single('profile'), function(req, res){
 app.get('/image/:imageName', function(req, res){
   res.sendFile(__dirname + '/public/image/' + req.params.imageName)
 });
+
+app.get('/chat', function(req, res){
+  res.render('chat.ejs');
+})
