@@ -12,6 +12,8 @@ const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
 let db;
+var ObjectId = require('mongodb').ObjectID;
+
 MongoClient.connect(process.env.DB_URL, function (error, client) {
   if (error) return console.log(error);
   db = client.db("todoapp");
@@ -294,6 +296,23 @@ app.get('/image/:imageName', function(req, res){
   res.sendFile(__dirname + '/public/image/' + req.params.imageName)
 });
 
-app.get('/chat', function(req, res){
-  res.render('chat.ejs');
+app.get('/chat',chkLogin, function(req, res){
+  db.collection('chatroom').find({ member : req.user._id }).toArray().then((result)=>{
+    console.log(result);
+    res.render('chat.ejs', {data : result})
+  })
+})
+
+app.post('/create_chat', chkLogin, function(req, res){
+    let saveData = {
+      title: "채팅방1",
+      // [채팅을 당한사람, 채팅을 건 사람]
+      member : [ObjectId(req.body._id), req.user._id],
+      date: new Date(),
+    }
+    db.collection("chatroom").insertOne(saveData)
+    .then((result, error) => {
+      console.log(result);
+      if(error) console.log(error);
+    });
 })
