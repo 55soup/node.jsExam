@@ -23,7 +23,7 @@ MongoClient.connect(process.env.DB_URL, function (error, client) {
 });
 
 app.get("/pet", function (req, res) {
-  res.send("펫용품 사시오");
+  res.send("펫용품 사r시오");
 });
 
 app.get("/beauty", function (req, res) {
@@ -121,7 +121,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 
-// app.use(미들웨어) 미들웨어: 요청 - 응답 중간에 뭔가 실행되는 코드
+// app.use(미들웨어) 미들웨어: 요청 - res 중간에 뭔가 실행되는 코드
 app.use(
   session({ secret: "비밀코드", resave: true, saveUninitialized: false })
 );
@@ -316,3 +316,36 @@ app.post('/create_chat', chkLogin, function(req, res){
       if(error) console.log(error);
     });
 })
+
+// 채팅방 메세지 보내는 api
+app.post('/message',chkLogin, function(req, res){
+
+  let saveData = {
+    parent : ObjectId(req.body.parent),
+    content : req.body.content,
+    userid : req.user._id,
+    date : new Date(),
+  };
+
+  db.collection('message').insertOne(saveData).then(() => {
+    console.log("메세지 DB저장 성공");
+    res.send('메세지 DB저장 성공')
+  })
+});
+
+app.get('/message/:parentid', chkLogin, function(req, res){
+  res.writeHead(200, {
+    "Connection": "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  });
+
+  db.collection('message').find({ parent : ObjectId('64d4f1a8ad656f3ad8b84158') }).toArray()
+  .then((result) => {
+    console.log(req.params.parentid);
+    res.write('event: test\n');
+    res.write(`data: ${JSON.stringify(result)} \n\n`);
+  })
+
+
+});
